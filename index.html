@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>우주 비행사 '정은찬'의 스페이스 로그</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti for Quiz celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;800;900&display=swap');
+    
+    * {
+      font-family: 'Pretendard', sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 3D Flip Card Styles */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+
+    /* Glassmorphism Effect */
+    .glass-card {
+      background: rgba(18, 22, 45, 0.65);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+    }
+    
+    .glass-button {
+      background: linear-gradient(135deg, rgba(147, 51, 234, 0.7), rgba(59, 130, 246, 0.7));
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-button:hover {
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+      transform: translateY(-2px);
+    }
+    .glass-button:active {
+      transform: scale(0.97);
+    }
+
+    /* Animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(2deg); }
+    }
+    .animate-float {
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.08); }
+    }
+    .animate-pulse-glow {
+      animation: pulse-glow 3s infinite ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .animate-shake {
+      animation: shake 0.4s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-[#060814] text-gray-100 min-h-screen relative overflow-x-hidden selection:bg-purple-500 selection:text-white">
+
+  <!-- Interactive Space Star Canvas -->
+  <canvas id="spaceCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+  <!-- Ambient Glow Gradients -->
+  <div class="fixed top-[-150px] left-[-150px] w-96 h-96 bg-purple-600/20 rounded-full blur-[130px] pointer-events-none z-0 animate-pulse-glow"></div>
+  <div class="fixed bottom-[-150px] right-[-150px] w-96 h-96 bg-cyan-600/20 rounded-full blur-[130px] pointer-events-none z-0 animate-pulse-glow"></div>
+
+  <!-- Main Container -->
+  <main class="relative z-10 max-w-4xl mx-auto px-4 py-10 sm:py-14 space-y-12">
+
+    <!-- 1. Header Profile Section -->
+    <header class="text-center space-y-4">
+      <div class="inline-block relative">
+        <div class="w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-3xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-pink-500 p-1 shadow-lg shadow-purple-500/30 animate-float">
+          <div class="w-full h-full bg-[#0d1024] rounded-[22px] flex items-center justify-center text-4xl sm:text-5xl">
+            🛸
+          </div>
+        </div>
+        <span class="absolute -bottom-2 -right-1 px-3 py-0.5 text-xs font-semibold bg-cyan-500 text-gray-950 rounded-full shadow-md">
+          ONLINE
+        </span>
+      </div>
+
+      <div class="space-y-2">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-200 to-cyan-300">
+          은하계 여행자, <span class="underline decoration-wavy decoration-purple-400">정은찬</span>
+        </h1>
+        <p class="text-gray-400 text-sm sm:text-base max-w-md mx-auto leading-relaxed">
+          별빛과 리듬을 탐험하는 우주 기지장입니다.<br class="hidden sm:inline">
+          호기심 가득한 이곳에서 저의 취향과 기록들을 살펴보세요!
+        </p>
+      </div>
+
+      <!-- Quick Badges -->
+      <div class="flex flex-wrap items-center justify-center gap-2 pt-2">
+        <span class="px-3 py-1 text-xs rounded-full bg-white/5 border border-white/10 text-purple-300 font-medium flex items-center gap-1.5">
+          <i class="fa-solid fa-meteor text-xs"></i> 별명: 정은찬
+        </span>
+        <span class="px-3 py-1 text-xs rounded-full bg-white/5 border border-white/10 text-cyan-300 font-medium flex items-center gap-1.5">
+          <i class="fa-solid fa-gamepad text-xs"></i> 리듬게임 수련생
+        </span>
+        <span class="px-3 py-1 text-xs rounded-full bg-white/5 border border-white/10 text-pink-300 font-medium flex items-center gap-1.5">
+          <i class="fa-solid fa-heart text-xs"></i> 낭만 우주러
+        </span>
+      </div>
+    </header>
+
+    <!-- 2. Favorite Things (3D Flip Cards) -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl sm:text-2xl font-bold flex items-center gap-2 text-purple-200">
+          <i class="fa-solid fa-sparkles text-yellow-400"></i> 내가 사랑하는 3가지
+        </h2>
+        <span class="text-xs text-gray-400 bg-white/5 px-2.5 py-1 rounded-full border border-white/10 animate-pulse">
+          <i class="fa-solid fa-hand-pointer mr-1"></i> 카드를 눌러보세요!
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <!-- Card 1: 홍균 -->
+        <div class="flip-card h-64 sm:h-72 cursor-pointer perspective-1000" onclick="toggleCard(this)">
+          <div class="flip-inner relative w-full h-full duration-500 transform-style-3d transition-transform rounded-2xl">
+            <!-- Front -->
+            <div class="glass-card absolute inset-0 rounded-2xl p-6 flex flex-col items-center justify-center text-center backface-hidden border-t-2 border-t-purple-400/50">
+              <div class="w-16 h-16 rounded-2xl bg-purple-500/20 flex items-center justify-center text-3xl mb-4 text-purple-300 shadow-inner">
+                🪐
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2">홍균</h3>
+              <p class="text-xs text-purple-300 bg-purple-950/70 px-3 py-1 rounded-full border border-purple-500/30">
+                #우주급_존재감
+              </p>
+              <div class="mt-4 text-[11px] text-gray-400 flex items-center gap-1">
+                <span>터치하여 숨은 이유 보기</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </div>
+            </div>
+            <!-- Back -->
+            <div class="glass-card absolute inset-0 rounded-2xl p-6 flex flex-col items-center justify-center text-center backface-hidden rotate-y-180 bg-gradient-to-br from-[#1d1238] to-[#121c3b] border border-purple-400/40">
+              <span class="text-2xl mb-2">📡</span>
+              <h4 class="text-base font-bold text-purple-300 mb-2">좋아하는 이유</h4>
+              <p class="text-sm text-gray-200 leading-relaxed word-keep-all">
+                "이름을 발음할 때마다 <strong>입안에서 팝핑 캔디처럼 톡톡 튀는</strong> 은하계 최강의 타격감과 리듬감이 느껴져서!"
+              </p>
+              <span class="mt-4 text-[10px] text-purple-400">다시 누르면 원상태로 복귀</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: 리듬게임 (수정됨) -->
+        <div class="flip-card h-64 sm:h-72 cursor-pointer perspective-1000" onclick="toggleCard(this)">
+          <div class="flip-inner relative w-full h-full duration-500 transform-style-3d transition-transform rounded-2xl">
+            <!-- Front -->
+            <div class="glass-card absolute inset-0 rounded-2xl p-6 flex flex-col items-center justify-center text-center backface-hidden border-t-2 border-t-pink-400/50">
+              <div class="w-16 h-16 rounded-2xl bg-pink-500/20 flex items-center justify-center text-3xl mb-4 text-pink-300 shadow-inner">
+                🎧
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2">리듬게임</h3>
+              <p class="text-xs text-pink-300 bg-pink-950/70 px-3 py-1 rounded-full border border-pink-500/30">
+                #비트_장인_꿈나무
+              </p>
+              <div class="mt-4 text-[11px] text-gray-400 flex items-center gap-1">
+                <span>터치하여 숨은 이유 보기</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </div>
+            </div>
+            <!-- Back -->
+            <div class="glass-card absolute inset-0 rounded-2xl p-6 flex flex-col items-center justify-center text-center backface-hidden rotate-y-180 bg-gradient-to-br from-[#2b122e] to-[#14122d] border border-pink-400/40">
+              <span class="text-2xl mb-2">⚡</span>
+              <h4 class="text-base font-bold text-pink-300 mb-2">좋아하는 이유</h4>
+              <p class="text-sm text-gray-200 leading-relaxed word-keep-all">
+                "떨어지는 노트를 온몸으로 쪼갤 때의 손맛! 비록 <strong>단 1삑에 억장이 무너져도</strong> 손가락이 멈추질 않아서!"
+              </p>
+              <span class="mt-4 text-[10px] text-pink-400">다시 누르면 원상태로 복귀</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: 이민성 -->
+        <div class="flip-card h-64 sm:h-72 cursor-pointer perspective-1000" onclick="toggleCard(this)">
+          <div class="flip-inner relative w-full h-full duration-500 transform-style-3d transition-transform rounded-2xl">
+            <!-- Front -->
+            <div class="glass-card absolute inset-0 rounded-2xl p-6 flex flex-col items-center justify-center text-center backface-hidden border-t-2 border-t-cyan-400/50">
+              <div class="w-16 h-16 rounded-2xl bg-cyan-500/20 flex items-center justify-center text-3xl mb-4 text-cyan-300 shadow-inner">
+                🌠
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2">이민성</h3>
+              <p class="text-xs text-cyan-300 bg-cyan-950/70 px-3 py-1 rounded-full border border-cyan-500/30">
+                #은하계_마스코트
+              </p>
+              <div class="mt-4 text-[11px] text-gray-400 flex items-center gap-1">
+                <span>터치하여 숨은 이유 보기</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </div>
+            </div>
+            <!-- Back -->
+            <div class="glass-card absolute inset-0 rounded-2xl p-6 flex flex-col items-center justify-center text-center backface-hidden rotate-y-180 bg-gradient-to-br from-[#0c223a] to-[#111933] border border-cyan-400/40">
+              <span class="text-2xl mb-2">💫</span>
+              <h4 class="text-base font-bold text-cyan-300 mb-2">좋아하는 이유</h4>
+              <p class="text-sm text-gray-200 leading-relaxed word-keep-all">
+                "우주 어딘가에 실재하는 <strong>천연 힐링 행성</strong> 같은 포근함과 도저히 미워할 수 없는 엉뚱한 매력 때문에!"
+              </p>
+              <span class="mt-4 text-[10px] text-cyan-400">다시 누르면 원상태로 복귀</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. OX Quiz Section -->
+    <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-6 relative overflow-hidden" id="quizSection">
+      <div class="flex items-center gap-3">
+        <span class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 text-lg">
+          <i class="fa-solid fa-circle-question"></i>
+        </span>
+        <div>
+          <h2 class="text-xl font-bold text-white">진실 혹은 거짓? OX 퀴즈</h2>
+          <p class="text-xs sm:text-sm text-gray-400">정은찬의 리듬게임 실체(?)를 맞춰보세요!</p>
+        </div>
+      </div>
+
+      <!-- Question Box -->
+      <div class="bg-black/30 border border-white/10 rounded-xl p-5 text-center sm:py-7">
+        <p class="text-xs uppercase tracking-widest text-purple-400 font-semibold mb-2">MISSION QUESTION</p>
+        <p class="text-lg sm:text-xl md:text-2xl font-bold text-gray-100">
+          "나는 최근에 <span class="text-cyan-300 underline decoration-cyan-400 underline-offset-4">hero</span>를 <span class="text-yellow-300">풀콤</span>을 쳤다"
+        </p>
+      </div>
+
+      <!-- Choices -->
+      <div class="grid grid-cols-2 gap-4">
+        <button onclick="handleQuizAnswer('O')" class="group relative py-4 sm:py-5 rounded-xl font-black text-2xl sm:text-3xl bg-emerald-500/10 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 transition duration-200 active:scale-95 flex items-center justify-center gap-2">
+          <span>⭕</span>
+          <span class="text-base sm:text-lg font-bold">그렇다 (O)</span>
+        </button>
+        <button onclick="handleQuizAnswer('X')" class="group relative py-4 sm:py-5 rounded-xl font-black text-2xl sm:text-3xl bg-rose-500/10 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 transition duration-200 active:scale-95 flex items-center justify-center gap-2">
+          <span>❌</span>
+          <span class="text-base sm:text-lg font-bold">아니다 (X)</span>
+        </button>
+      </div>
+
+      <!-- Result Feedback Box -->
+      <div id="quizResult" class="hidden rounded-xl p-4 text-center transition-all duration-300">
+        <!-- Dynamic Result Injected by JS -->
+      </div>
+    </section>
+
+    <!-- 4. Random Quote Generator -->
+    <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-xl bg-pink-500/20 flex items-center justify-center text-pink-400 text-lg">
+            <i class="fa-solid fa-quote-left"></i>
+          </span>
+          <div>
+            <h2 class="text-xl font-bold text-white">정은찬의 은하 명언집</h2>
+            <p class="text-xs sm:text-sm text-gray-400">버튼을 누를 때마다 무작위 은하 지혜가 수신됩니다.</p>
+          </div>
+        </div>
+        <span id="quoteIndexBadge" class="text-xs font-mono bg-pink-900/40 text-pink-300 px-3 py-1 rounded-full border border-pink-500/30">
+          #1 / 12
+        </span>
+      </div>
+
+      <!-- Quote Display -->
+      <div class="relative bg-black/40 border border-white/10 rounded-xl p-6 sm:p-8 min-h-[140px] flex flex-col justify-center items-center text-center">
+        <i class="fa-solid fa-star text-yellow-400/20 text-5xl absolute top-3 left-4 select-none"></i>
+        <p id="quoteText" class="text-base sm:text-lg md:text-xl font-medium text-purple-100 transition-opacity duration-300">
+          "1 miss로 끊긴 콤보는 우주의 먼지가 되어 사라지지만, 나의 손가락은 다시 화면을 두드린다."
+        </p>
+        <p id="quoteAuthor" class="text-xs text-purple-400 mt-3 font-semibold">
+          — 정은찬 명언록 中 —
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 items-center justify-center pt-1">
+        <button onclick="generateRandomQuote()" class="glass-button w-full sm:w-auto px-6 py-3 rounded-xl font-semibold text-white flex items-center justify-center gap-2 shadow-lg">
+          <i class="fa-solid fa-shuffle"></i>
+          <span>새로운 명언 뽑기</span>
+        </button>
+        <button onclick="copyCurrentQuote()" class="w-full sm:w-auto px-5 py-3 rounded-xl font-medium text-gray-300 bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center gap-2 transition active:scale-95">
+          <i class="fa-regular fa-copy"></i>
+          <span id="copyBtnText">명언 복사하기</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 5. Mini Game: 10-Second Speed Clicker -->
+    <section class="glass-card rounded-2xl p-6 sm:p-8 space-y-6 border-b-2 border-b-cyan-500/40">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-lg">
+            <i class="fa-solid fa-stopwatch"></i>
+          </span>
+          <div>
+            <h2 class="text-xl font-bold text-white">우주선 광속 충전 챌린지!</h2>
+            <p class="text-xs sm:text-sm text-gray-400">10초 동안 버튼을 광클하여 워프 에너지를 모아보세요.</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-gray-400">최고 기록</span>
+          <p id="bestScore" class="text-base font-black text-yellow-400 font-mono">0 회</p>
+        </div>
+      </div>
+
+      <!-- Game Status Dashboard -->
+      <div class="grid grid-cols-2 gap-4 text-center">
+        <div class="bg-black/30 border border-white/10 rounded-xl p-3 sm:p-4">
+          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">남은 시간</p>
+          <p id="timeLeft" class="text-3xl sm:text-4xl font-extrabold text-cyan-300 font-mono">10.0s</p>
+        </div>
+        <div class="bg-black/30 border border-white/10 rounded-xl p-3 sm:p-4">
+          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">누른 횟수</p>
+          <p id="clickCount" class="text-3xl sm:text-4xl font-extrabold text-pink-400 font-mono">0</p>
+        </div>
+      </div>
+
+      <!-- Progress Bar for Timer -->
+      <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+        <div id="gameProgress" class="h-full bg-gradient-to-r from-cyan-400 to-purple-500 w-full transition-all duration-100 ease-linear"></div>
+      </div>
+
+      <!-- Action Button Area -->
+      <div class="flex flex-col items-center justify-center pt-2">
+        <button id="tapButton" onclick="handleTap()" class="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full font-black text-xl text-white shadow-2xl flex flex-col items-center justify-center transition transform active:scale-90 select-none bg-gradient-to-b from-indigo-500 via-purple-600 to-pink-600 border-4 border-white/20 hover:shadow-purple-500/50">
+          <div class="text-4xl mb-1 animate-bounce" id="tapIcon">🚀</div>
+          <span id="tapButtonTitle" class="text-lg sm:text-xl font-bold">CLICK ME!</span>
+          <span id="tapButtonSubtitle" class="text-[11px] text-purple-200 mt-1 font-normal">탭하면 시작됩니다</span>
+        </button>
+
+        <p id="gameMessage" class="mt-4 text-sm text-gray-300 text-center font-medium min-h-[24px]">
+          버튼을 누르는 순간 타이머가 카운트다운을 시작합니다!
+        </p>
+
+        <button id="resetGameBtn" onclick="resetGame()" class="mt-3 text-xs text-gray-400 hover:text-white underline underline-offset-4 hidden">
+          게임 다시 시작하기
+        </button>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-gray-500 text-xs space-y-1">
+      <p>© 2026 Space Voyager Jung Eun-chan. All rights reserved.</p>
+      <p class="text-gray-600">Built with pure HTML, CSS, JavaScript in the Cosmos.</p>
+    </footer>
+
+  </main>
+
+  <!-- Interactive Logic Script -->
+  <script>
+    /* ==========================================================
+       1. STARFIELD CANVAS ANIMATION (우주 배경)
+       ========================================================== */
+    const canvas = document.getElementById('spaceCanvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    const STAR_COUNT = 130;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      initStars();
+    });
+    resizeCanvas();
+
+    function initStars() {
+      stars = [];
+      for (let i = 0; i < STAR_COUNT; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5 + 0.4,
+          alpha: Math.random() * 0.8 + 0.2,
+          speed: Math.random() * 0.35 + 0.1,
+          twinkleSpeed: Math.random() * 0.02 + 0.005,
+          color: ['#ffffff', '#c7d2fe', '#fbcfe8', '#a5f3fc'][Math.floor(Math.random() * 4)]
+        });
+      }
+    }
+    initStars();
+
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let s of stars) {
+        // Move slightly downward
+        s.y += s.speed;
+        if (s.y > canvas.height) {
+          s.y = 0;
+          s.x = Math.random() * canvas.width;
+        }
+
+        // Twinkle
+        s.alpha += s.twinkleSpeed;
+        if (s.alpha > 1 || s.alpha < 0.2) {
+          s.twinkleSpeed = -s.twinkleSpeed;
+        }
+
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+        ctx.fillStyle = s.color;
+        ctx.globalAlpha = Math.max(0, Math.min(1, s.alpha));
+        ctx.shadowBlur = 4;
+        ctx.shadowColor = s.color;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(drawStars);
+    }
+    requestAnimationFrame(drawStars);
+
+
+    /* ==========================================================
+       2. FLIP CARD INTERACTION
+       ========================================================== */
+    function toggleCard(cardElement) {
+      const inner = cardElement.querySelector('.flip-inner');
+      if (inner.classList.contains('rotate-y-180')) {
+        inner.classList.remove('rotate-y-180');
+      } else {
+        inner.classList.add('rotate-y-180');
+      }
+    }
+
+
+    /* ==========================================================
+       3. OX QUIZ SYSTEM (정답: X)
+       ========================================================== */
+    let quizAnswered = false;
+
+    function handleQuizAnswer(choice) {
+      const resultBox = document.getElementById('quizResult');
+      const quizSection = document.getElementById('quizSection');
+      resultBox.classList.remove('hidden');
+
+      if (choice === 'X') {
+        // Correct Answer
+        resultBox.className = 'rounded-xl p-4 text-center bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 animate-bounce-once';
+        resultBox.innerHTML = `
+          <div class="flex items-center justify-center gap-2 text-lg font-bold text-emerald-300 mb-1">
+            <i class="fa-solid fa-circle-check text-xl"></i> 정답입니다! 정확히 알고 계시네요! 🎉
+          </div>
+          <p class="text-xs sm:text-sm text-emerald-100/90 leading-relaxed">
+            다 잡아놓고 <strong>통한의 딱 '1삑(1 miss)'</strong>이 터져버렸습니다... 😭<br class="hidden sm:inline">
+            그 1삑 때문에 우주 저 멀리로 날아간 풀콤의 꿈! 조만간 반드시 복수전 갑니다!
+          </p>
+        `;
+
+        // Confetti Fireworks effect
+        if (typeof confetti === 'function') {
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        }
+      } else {
+        // Wrong Answer (O selected)
+        quizSection.classList.add('animate-shake');
+        setTimeout(() => quizSection.classList.remove('animate-shake'), 400);
+
+        resultBox.className = 'rounded-xl p-4 text-center bg-rose-950/80 border border-rose-500/50 text-rose-200';
+        resultBox.innerHTML = `
+          <div class="flex items-center justify-center gap-2 text-lg font-bold text-rose-300 mb-1">
+            <i class="fa-solid fa-circle-xmark text-xl"></i> 아쉽지만 땡! 오답입니다 😭
+          </div>
+          <p class="text-xs sm:text-sm text-rose-100/90 leading-relaxed">
+            풀콤이었으면 축제 열었죠! 현실은 <strong>마지막에 통한의 '1삑'</strong>으로 눈물을 삼켰습니다...<br class="hidden sm:inline">
+            (정답은 <strong>X</strong>입니다! 1삑의 설움...!)
+          </p>
+        `;
+      }
+    }
+
+
+    /* ==========================================================
+       4. RANDOM QUOTE GENERATOR (12종)
+       ========================================================== */
+    const quotes = [
+      "1삑(1 miss)으로 끊긴 콤보는 우주의 먼지가 되어 사라지지만, 나의 손가락은 다시 화면을 두드린다.",
+      "인생은 마치 'hero'의 채보와 같다. 쏟아져 내려도 하나씩 치다 보면 어떻게든 넘어간다.",
+      "단 한 번의 1삑에 억장이 무너져도, 다시 재시작 버튼을 누르는 것이 진정한 리듬게이머다.",
+      "우주선에 산소가 부족해도 괜찮다. 좋은 노래와 리듬게임만 있다면 자가호흡이 가능하다.",
+      "완벽한 풀콤(Full Combo)만이 삶의 전부는 아니다. 1삑이어도 완주(Clear)한 당신은 이미 우주 챔피언이다.",
+      "오늘 칠 노트를 내일로 미루지 말라. 손가락이 굳기 전에 즉시 플레이하라.",
+      "블랙홀조차 빨아들이지 못하는 유일한 것, 그것은 바로 나의 꺾이지 않는 리듬게임 열정이다.",
+      "지구에서의 고민은 우주정거장에서 내려다보면 그저 먼지 한 톨에 불과하다. 쿨하게 넘기자!",
+      "hero 풀콤은 눈앞에서 놓쳤지만, 내 인생의 풀콤보는 이제부터 시작이다.",
+      "홍균이라는 이름 세 글자 속에는 우주의 신비로운 울림이 깃들어 있다.",
+      "이민성의 온화함은 영하 270도 우주의 극한 추위도 단숨에 녹여버린다.",
+      "1삑 났다고 강제종료(탈주)하지 마라. 역전의 클리어는 언제나 마지막 마디에 있다."
+    ];
+
+    let currentQuoteIndex = 0;
+
+    function generateRandomQuote() {
+      let nextIndex;
+      do {
+        nextIndex = Math.floor(Math.random() * quotes.length);
+      } while (nextIndex === currentQuoteIndex && quotes.length > 1);
+      
+      currentQuoteIndex = nextIndex;
+      const quoteEl = document.getElementById('quoteText');
+      const badgeEl = document.getElementById('quoteIndexBadge');
+
+      quoteEl.style.opacity = '0';
+      setTimeout(() => {
+        quoteEl.textContent = `"${quotes[currentQuoteIndex]}"`;
+        badgeEl.textContent = `#${currentQuoteIndex + 1} / ${quotes.length}`;
+        quoteEl.style.opacity = '1';
+      }, 150);
+    }
+
+    function copyCurrentQuote() {
+      const quote = quotes[currentQuoteIndex];
+      const textToCopy = `${quote} - 정은찬의 우주 명언록`;
+
+      const tempTextArea = document.createElement('textarea');
+      tempTextArea.value = textToCopy;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      try {
+        document.execCommand('copy');
+        const copyBtnText = document.getElementById('copyBtnText');
+        copyBtnText.textContent = "복사 완료! 🚀";
+        setTimeout(() => {
+          copyBtnText.textContent = "명언 복사하기";
+        }, 1800);
+      } catch (err) {
+        console.error('Copy failed:', err);
+      }
+      document.body.removeChild(tempTextArea);
+    }
+
+
+    /* ==========================================================
+       5. 10-SECOND SPEED CLICKER MINI GAME
+       ========================================================== */
+    let gameState = 'IDLE'; // 'IDLE', 'RUNNING', 'FINISHED'
+    let score = 0;
+    let bestScore = 0;
+    const TOTAL_TIME = 10.0;
+    let timeRemaining = TOTAL_TIME;
+    let timerInterval = null;
+
+    const tapButton = document.getElementById('tapButton');
+    const tapIcon = document.getElementById('tapIcon');
+    const tapButtonTitle = document.getElementById('tapButtonTitle');
+    const tapButtonSubtitle = document.getElementById('tapButtonSubtitle');
+    const timeLeftEl = document.getElementById('timeLeft');
+    const clickCountEl = document.getElementById('clickCount');
+    const gameProgressEl = document.getElementById('gameProgress');
+    const gameMessageEl = document.getElementById('gameMessage');
+    const bestScoreEl = document.getElementById('bestScore');
+    const resetGameBtn = document.getElementById('resetGameBtn');
+
+    function handleTap() {
+      if (gameState === 'IDLE') {
+        startGame();
+        incrementScore();
+      } else if (gameState === 'RUNNING') {
+        incrementScore();
+      }
+    }
+
+    function startGame() {
+      gameState = 'RUNNING';
+      score = 0;
+      timeRemaining = TOTAL_TIME;
+      clickCountEl.textContent = score;
+      tapButtonTitle.textContent = "TAP! TAP!";
+      tapButtonSubtitle.textContent = "더 빠르게 누르세요!";
+      tapIcon.textContent = "🔥";
+      gameMessageEl.textContent = "속도를 올리세요! 우주선이 가속하고 있습니다!";
+      resetGameBtn.classList.add('hidden');
+
+      const startTime = performance.now();
+
+      timerInterval = setInterval(() => {
+        const elapsed = (performance.now() - startTime) / 1000;
+        timeRemaining = Math.max(0, TOTAL_TIME - elapsed);
+        
+        timeLeftEl.textContent = timeRemaining.toFixed(1) + 's';
+        const progressPct = (timeRemaining / TOTAL_TIME) * 100;
+        gameProgressEl.style.width = `${progressPct}%`;
+
+        if (timeRemaining <= 0) {
+          endGame();
+        }
+      }, 50);
+    }
+
+    function incrementScore() {
+      score++;
+      clickCountEl.textContent = score;
+
+      // Small visual feedback on button
+      tapButton.style.transform = `scale(${Math.min(1.15, 0.95 + score * 0.002)})`;
+      setTimeout(() => {
+        if (gameState === 'RUNNING') tapButton.style.transform = 'scale(1)';
+      }, 60);
+    }
+
+    function endGame() {
+      clearInterval(timerInterval);
+      gameState = 'FINISHED';
+      timeRemaining = 0;
+      timeLeftEl.textContent = '0.0s';
+      gameProgressEl.style.width = '0%';
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestScoreEl.textContent = `${bestScore} 회`;
+      }
+
+      tapIcon.textContent = "🏆";
+      tapButtonTitle.textContent = "도전 완료!";
+      tapButtonSubtitle.textContent = "기록: " + score + "회";
+      resetGameBtn.classList.remove('hidden');
+
+      // Feedback message according to score
+      let rankMessage = "";
+      if (score >= 80) {
+        rankMessage = `🚀 대박! 10초에 ${score}타! 은하계 최강의 초광속 손가락입니다!`;
+        if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 90 });
+      } else if (score >= 50) {
+        rankMessage = `⚡ 훌륭합니다! 10초에 ${score}타! 우주비행선 워프 엔진 충전 완료!`;
+        if (typeof confetti === 'function') confetti({ particleCount: 70, spread: 60 });
+      } else if (score >= 30) {
+        rankMessage = `🛰️ 준수하네요! ${score}회 기록 달성! 손가락 스트레칭 후 다시 도전해보세요!`;
+      } else {
+        rankMessage = `😴 ${score}회 클릭! 아직 우주선 시동이 덜 걸렸나 봐요. 한 번 더?`;
+      }
+
+      gameMessageEl.innerHTML = `<span class="text-cyan-300 font-bold">${rankMessage}</span>`;
+    }
+
+    function resetGame() {
+      clearInterval(timerInterval);
+      gameState = 'IDLE';
+      score = 0;
+      timeRemaining = TOTAL_TIME;
+      timeLeftEl.textContent = '10.0s';
+      clickCountEl.textContent = '0';
+      gameProgressEl.style.width = '100%';
+      tapButton.style.transform = 'scale(1)';
+      tapIcon.textContent = "🚀";
+      tapButtonTitle.textContent = "CLICK ME!";
+      tapButtonSubtitle.textContent = "탭하면 시작됩니다";
+      gameMessageEl.textContent = "버튼을 누르는 순간 타이머가 카운트다운을 시작합니다!";
+      resetGameBtn.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
